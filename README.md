@@ -1,2 +1,6 @@
 # VOiCES_utils
-Scripts and Utilities for working with the VOiCES dataset
+Scripts and utilities for working with the VOiCES dataset
+
+## Contents
+## Instructions
+## Requirements
