@@ -33,9 +33,9 @@ if __name__ == '__main__':
     # Keep only the filename, noisy recording time, and transcript columns
     df = df[['filename','noisy_time','transcript']]
     # Rename columns
-    df.rename(columns={"filename":"audio_filepath",
+    df=df.rename(columns={"filename":"audio_filepath",
     "noisy_time":"duration","transcript":"text"})
     # Add the dataset root to every every entry in the filename column
-    df['filename'] = df['filename'].apply(lambda x: DATASET_ROOT+x)
+    df['audio_filepath'] = df['audio_filepath'].apply(lambda x: DATASET_ROOT+x)
     # Output to JSON
     df.to_json(args.MANIFEST_PATH,orient='records',lines=True)
