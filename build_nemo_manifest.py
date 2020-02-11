@@ -49,6 +49,27 @@ def convert_df_to_manifest(df,dataset_root):
     record_string = df.to_json(orient='records',lines=True)
     return record_string
 
+def split_df(df):
+    """
+    This will split a VOiCES index dataframe by microphone and distractor type
+
+    Inputs:
+        df - A pandas dataframe representing the index file of the dataset,
+            with the default columns of VOiCES index files.
+    Outputs:
+        df_dict - A dictionary where keys are (mic,distractor type) and values
+            are dataframes corresponding to slices of df with that mic and
+            distractor value pair.
+    """
+    distractor_values =df['distractor'].unique()
+    mic_values = df['mic'].unique()
+    df_dict = {}
+    for m_val in mic_values:
+        for dist_val in distractor_values:
+            sub_df = df[(df['mic']==m_val) & (df['distractor']==dist_val)]
+            df_dict[(m_val,dist_val)]=sub_df
+    return df_dict
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -60,7 +81,10 @@ if __name__ == '__main__':
     default='none',type=str)
     parser.add_argument('-m',dest='MAX_DURATION',help='Maximum allowed recording duration in seconds',
     default=30.0,type=float)
-    parser.add_argument('--drop_bad',dest='DROP_BAD',action='store_true')
+    parser.add_argument('--drop_bad',dest='DROP_BAD',action='store_true',
+    help='Drop recordings shorter than source audio')
+    parser.add_argument('--split',dest='SPLIT',action='store_true',
+    help='Split by microphone and background type')
     args = parser.parse_args()
 
     DATASET_ROOT=args.DATASET_ROOT
@@ -79,7 +103,26 @@ if __name__ == '__main__':
 
     trimmed_df = trim_df(df,max_duration=args.MAX_DURATION,
     drop_bad=args.DROP_BAD)
-    json_string = convert_df_to_manifest(trimmed_df,DATASET_ROOT)
-    # Output to file
-    with open(args.MANIFEST_PATH,'w') as fout:
-        fout.write(json_string)
+
+    print('full dataset has {} examples'.format(len(trimmed_df)))
+
+    if(args.SPLIT):
+        print('Creating manifests for each mic and distractor combination')
+        filename, file_extension = os.path.splitext(args.MANIFEST_PATH)
+        df_dict = split_df(trimmed_df)
+        for key,val in df_dict.items():
+            mic_val = key[0]
+            distractor_val = key[1]
+            suffix = '_mic_{}_dist_{}'.format(mic_val,distractor_val)
+            outname = filename+suffix+file_extension
+            print('For mic {} and distractor {} there are {} examples, saved at {}'.format(mic_val,distractor_val,len(val),outname))
+            json_string = convert_df_to_manifest(val,DATASET_ROOT)
+            with open(outname,'w') as fout:
+                fout.write(json_string)
+
+
+    else:
+        json_string = convert_df_to_manifest(trimmed_df,DATASET_ROOT)
+        # Output to file
+        with open(args.MANIFEST_PATH,'w') as fout:
+            fout.write(json_string)
