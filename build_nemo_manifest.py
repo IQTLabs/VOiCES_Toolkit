@@ -114,7 +114,7 @@ if __name__ == '__main__':
             mic_val = key[0]
             distractor_val = key[1]
             suffix = '_mic_{}_dist_{}'.format(mic_val,distractor_val)
-            outname = filename+suffix+file_extension
+            outname = filename+suffix+'.json'
             print('For mic {} and distractor {} there are {} examples, saved at {}'.format(mic_val,distractor_val,len(val),outname))
             json_string = convert_df_to_manifest(val,DATASET_ROOT)
             with open(outname,'w') as fout:
