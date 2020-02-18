@@ -1,3 +1,29 @@
+"""
+This script can be used to convert the information in a VOiCES index file into
+a JSON file or files compatible with NVIDIA's NeMo ASR audio manifest format.
+
+The script takes in 6 command line arguments:
+
+-r: The absolute path of the dataset root (where there are subfolders /references,
+    /distant-16k, and /source-16k).
+-i: The absolute path to the VOiCES index file (.csv) that will be used to build
+    the manifest.
+-o: The absolute path for the output manifest file, must have .json fil
+    extension
+-m: The maximum duration in seconds of audio files to include, defaults to 30.0
+    seconds
+--drop_bad:  Optional.  If enabled, all recordings in the dataset that are
+    not the same length as the corresponding source audio will be dropped.
+--split:  Optional.  If enabled, instead of producing one manifest file the
+    script will produce a manifest file for every combination of distractor and 
+    mic, appending the combination code to the end of the filename before '.json'
+    e.g.  If the absolute path for the output manifest file is
+    /path_to_data/references/test_manifest.json and --split is enabled, the
+    manifest for mic 5 and distractor type babb will be
+    /path_to_data/references/test_manifest_mic_5_dist_babb.json
+
+"""
+
 import os
 import argparse
 import pandas as pd
@@ -74,7 +100,7 @@ def split_df(df):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-r',dest='DATASET_ROOT',help='VOiCES dataset root',
-    default='none',type=str)
+    required=True,type=str)
     parser.add_argument('-i',dest='INDEX_PATH',help='The absolute path to the index file',
     default='none',type=str)
     parser.add_argument('-o',dest='MANIFEST_PATH',help='Target file for the built manifest',
@@ -87,11 +113,7 @@ if __name__ == '__main__':
     help='Split by microphone and background type')
     args = parser.parse_args()
 
-    DATASET_ROOT=args.DATASET_ROOT
-    if args.DATASET_ROOT == 'none':
-        DATASET_ROOT = os.path.join(os.getcwd(),'')
-    else:
-        DATASET_ROOT = os.path.join(args.DATASET_ROOT,'')
+    DATASET_ROOT = os.path.join(args.DATASET_ROOT,'')
 
     if args.INDEX_PATH=='none':
         INDEX_PATH = os.path.join(DATASET_ROOT, 'references/train_index.csv')
