@@ -1,0 +1,6 @@
+torch
+nemo-toolkit
+nemo-asr
+librosa
+pandas
+ruamel
