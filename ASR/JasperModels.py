@@ -29,7 +29,7 @@ class JasperInference:
         self.data_preprocessor = nemo_asr.AudioToMelSpectrogramPreprocessor(
             sample_rate=self.model_definition['sample_rate'],
             **self.model_definition["AudioToMelSpectrogramPreprocessor"])
-        if encoder_module:
+        if encoder_module is not None:
             # Pass in an already instantiated neural module for the encoder
             assert isinstance(encoder_module,NeuralModule), 'encoder is not a neural module'
             self.encoder = encoder_module
@@ -37,7 +37,7 @@ class JasperInference:
             self.encoder = nemo_asr.JasperEncoder(
                 feat_in=self.model_definition['AudioToMelSpectrogramPreprocessor']['features'],
                 **self.model_definition['JasperEncoder'])
-        if decoder_module:
+        if decoder_module is not None:
             # Pass in an already instantiated neural module for the decoder
             assert isinstance(decoder_module,NeuralModule), 'decoder is not a neural module'
             self.decoder = decoder_module

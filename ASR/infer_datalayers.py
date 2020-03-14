@@ -49,18 +49,22 @@ class AudioInferDataLayer(DataLayerNM):
         return torch.as_tensor(self.signal, dtype=torch.float32), \
                torch.as_tensor(self.signal_shape, dtype=torch.int64)
 
-    def set_signal(self, signal):
+    def set_signal(self, signals):
         """
-        This sets the value of the waveform to transcribe.  It must be updated
+        This sets the value of the waveforms to transcribe.  It must be updated
         before calling the infer method of the neural_factory.
 
         Inputs:
-            signal - Waveform to transcribe.  Array of shape (signal length)
+            signals - list of arrays where each array contains a waveform to
+                transcribe.
         """
-        self.signal = np.reshape(signal, [1, -1])
-        self.signal_shape = np.expand_dims(self.signal.size, 0).astype(np.int64)
+        batch_size = len(signals)
+        self.signal_shape = np.array([len(signal) for signal in signals])
+        max_length = np.max(self.signal_shape)
+        self.signal = np.zeros((batch_size,max_length))
+        for i in range(batch_size):
+            self.signal[i,:self.signal_shape[i]] = np.array(signals[i])
         self.output = True
-
 
     def __len__(self):
         return 1
