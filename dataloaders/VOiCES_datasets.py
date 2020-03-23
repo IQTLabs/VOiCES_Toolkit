@@ -2,10 +2,39 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
+from torch.nn.utils.rnn import pad_sequence
 import os
 import librosa
 
-class VOiCES_SpeakerVerfication(Dataset):
+class PadSequence:
+    def __call__(self, batch):
+        """
+        A helper function that can be passed to pytorch's DataLoader class as
+        a collate_fn.
+        
+        Arguments:
+            batch: is a list of tuples of form (data, label).  The data is in
+                (time,channels) shape format
+        Returns:
+            sequences_padded:  The padded data batch, float tensors with 
+                shape of (batch size, max time in batch, channels)
+            lengths:  The lengths of the sequences in the batch.  LongTensor of
+                shape (batch_size)
+            labels:   The labels for the batch.  LongTensor of shape (batch_size)
+        """
+        # Sort the batch in the descending order
+        sorted_batch = sorted(batch, key=lambda x: x[0].shape[0], reverse=True)
+        # Get each sequence and pad it
+        sequences = [x[0] for x in sorted_batch]
+        sequences_padded = pad_sequence(sequences, batch_first=True)
+        # Also need to store the length of each sequence
+        # This is later needed in order to unpad the sequences
+        lengths = torch.LongTensor([len(x) for x in sequences])
+        # Don't forget to grab the labels of the *sorted* batch
+        labels = torch.LongTensor(list(map(lambda x: x[1], sorted_batch)))
+        return sequences_padded, lengths, labels
+
+class VOiCES_SpeakerVerification(Dataset):
     """
     A torch dataset class for speaker/gender classification tasks.
     
@@ -17,7 +46,8 @@ class VOiCES_SpeakerVerfication(Dataset):
         min_length: mininum length, in seconds, of recordings to include
         max_length: mininum length, in seconds, of recordings to include
         label:  One of {speaker, sex}. Whether to use sex or speaker ID as a label
-        transform:  Callable, transformation to perform on the waveform
+        transform:  Callable, transformation to perform on the waveform.  Must return array
+            with shape (length,channels)
     """
     def __init__(self,dataset_root,df,min_length=0.0,max_length=30.0,label='speaker',transform=None):
         if label not in ('sex','speaker'):
@@ -53,10 +83,11 @@ class VOiCES_SpeakerVerfication(Dataset):
                 label = 1
         elif self.label =='speaker':
             label = self.speaker_id_mapping[item['speaker']]
-            
+        instance = instance[:,np.newaxis]
         # Add transforms
         if self.transform is not None:
             instance = self.transform(instance)
+        instance = torch.from_numpy(instance)
         return instance,label
     
     def __len__(self):
