@@ -2,9 +2,17 @@
 Scripts and utilities for working with the VOiCES dataset
 
 ## Contents
-## Instructions
+`build_indices.py`:  This script is used to produce CSV index files that contain
+information about all of the examples in the dataset and
 
-### Training and Evaluating End-to-End ASR model on VOiCES with Nvidia NeMo
+`build_nemo_manifest.py`:
+
+
+## Training and Evaluating End-to-End ASR model on VOiCES with Nvidia NeMo
+
+As an example of working with the VOiCES dataset, we provide instructions for using a pre-trained ASR model with the [NVIDIA Neural Modules toolkit](https://nvidia.github.io/NeMo/index.html).  Specifically, we will run inference with [Quartznet](https://arxiv.org/abs/1910.10261), and the fine-tune it on 
+
+The following will set up the docker container for running training and inference with Quartznet.
 
 ```
 # Pull the docker
@@ -24,8 +32,8 @@ pip install .
 pip install frozendict
 ```
 
+
+
 ```
 python /NeMo/examples/asr/jasper_eval.py --model_config=/NeMo/examples/asr/configs/quartznet15x5.yaml --eval_datasets "/data/VOiCES_devkit/references/test_manifest_mic_5_dist_none.json" --load_dir=/data/quartznet_checkpoints --lm_path=/NeMo/scripts/language_model/6-gram-lm.binary --batch_size=16
 ```
-
-## Requirements
