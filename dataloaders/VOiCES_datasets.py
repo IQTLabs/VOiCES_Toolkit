@@ -12,6 +12,11 @@ class PadSequence:
         A helper function that can be passed to pytorch's DataLoader class as
         a collate_fn.
         
+        The first two outputs, sequences_padded and lengths, can be fed into
+        torch.nn.utils.rnn.pack_padded_sequence to produce a packed sequence
+        object, in batch_first=True format.
+ 
+        
         Arguments:
             batch: is a list of tuples of form (data, label).  The data is in
                 (time,channels) shape format
@@ -47,7 +52,7 @@ class VOiCES_SpeakerVerification(Dataset):
         max_length: mininum length, in seconds, of recordings to include
         label:  One of {speaker, sex}. Whether to use sex or speaker ID as a label
         transform:  Callable, transformation to perform on the waveform.  Must return array
-            with shape (length,channels)
+            with shape (time,channels)
     """
     def __init__(self,dataset_root,df,min_length=0.0,max_length=30.0,label='speaker',transform=None):
         if label not in ('sex','speaker'):
