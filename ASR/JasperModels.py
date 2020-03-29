@@ -3,7 +3,7 @@ import nemo_asr
 from nemo_asr.helpers import post_process_predictions, word_error_rate
 import numpy as np
 from nemo_asr.parts.features import WaveformFeaturizer
-from infer_datalayers import AudioInferDataLayer
+from .infer_datalayers import AudioInferDataLayer
 from nemo.core.neural_modules import NeuralModule
 from nemo.backends.pytorch.nm import DataLayerNM
 from nemo.core.neural_types import *
@@ -64,11 +64,11 @@ class JasperInference:
         if decoder_weight_path:
             self.decoder_weight_path = decoder_weight_path
             self.decoder.restore_from(decoder_weight_path)
-    def infer(self,waveform=None,filepath=None,return_logits=False):
+    def infer(self,filepath=None,waveform=None,return_logits=False):
         if filepath:
             waveform,sr = librosa.core.load(filepath,sr=self.model_definition['sample_rate'])
             self.data_layer.set_signal(waveform)
-        elif any(waveform):
+        elif waveform is not None:
             self.data_layer.set_signal(waveform)
         tensors_to_evaluate = [self.predictions]
         if return_logits:
@@ -76,7 +76,7 @@ class JasperInference:
         evaluated_tensors = self.neural_factory.infer(tensors_to_evaluate)
         greedy_transcript = post_process_predictions(evaluated_tensors[0],self.vocab)
         result_dict = {'greedy prediction':evaluated_tensors[0]}
-        result_dict['greedy transcript']=greedy_transcript[0]
+        result_dict['greedy transcript']=greedy_transcript
         if return_logits:
             result_dict['logits']=evaluated_tensors[1]
         return result_dict
