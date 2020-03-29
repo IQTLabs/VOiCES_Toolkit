@@ -76,7 +76,7 @@ class JasperInference:
         evaluated_tensors = self.neural_factory.infer(tensors_to_evaluate)
         greedy_transcript = post_process_predictions(evaluated_tensors[0],self.vocab)
         result_dict = {'greedy prediction':evaluated_tensors[0]}
-        result_dict['greedy transcript']=greedy_transcript[0]
+        result_dict['greedy transcript']=greedy_transcript
         if return_logits:
             result_dict['logits']=evaluated_tensors[1]
         return result_dict
