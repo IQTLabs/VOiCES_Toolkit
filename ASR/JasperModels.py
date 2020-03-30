@@ -64,16 +64,19 @@ class JasperInference:
         if decoder_weight_path:
             self.decoder_weight_path = decoder_weight_path
             self.decoder.restore_from(decoder_weight_path)
-    def infer(self,filepath=None,waveform=None,return_logits=False):
-        if filepath:
-            waveform,sr = librosa.core.load(filepath,sr=self.model_definition['sample_rate'])
-            self.data_layer.set_signal(waveform)
-        elif waveform is not None:
-            self.data_layer.set_signal(waveform)
+    def infer(self,filepaths=None,waveforms=None,return_logits=False):
+        if filepaths is not None:
+            waveforms = []
+            for filepath in filepaths:
+                waveform,sr = librosa.core.load(filepath,sr=self.model_definition['sample_rate'])
+                waveforms.append(waveform)
+            self.data_layer.set_signal(waveforms)
+        elif waveforms is not None:
+            self.data_layer.set_signal(waveforms)
         tensors_to_evaluate = [self.predictions]
         if return_logits:
             tensors_to_evaluate.append(self.log_probs)
-        evaluated_tensors = self.neural_factory.infer(tensors_to_evaluate)
+        evaluated_tensors = self.neural_factory.infer(tensors_to_evaluate,verbose=False)
         greedy_transcript = post_process_predictions(evaluated_tensors[0],self.vocab)
         result_dict = {'greedy prediction':evaluated_tensors[0]}
         result_dict['greedy transcript']=greedy_transcript

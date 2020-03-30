@@ -37,3 +37,6 @@ pip install frozendict
 ```
 python /NeMo/examples/asr/jasper_eval.py --model_config=/NeMo/examples/asr/configs/quartznet15x5.yaml --eval_datasets "/data/VOiCES_devkit/references/test_manifest_mic_5_dist_none.json" --load_dir=/data/quartznet_checkpoints --lm_path=/NeMo/scripts/language_model/6-gram-lm.binary --batch_size=16
 ```
+```
+python /NeMo/examples/asr/quartznet.py --num_epochs=3 --model_config=/data/quartznet_checkpoints/quartznet15x5.yaml --train_dataset "/data/VOiCES_devkit/references/train_manifest.json" --lr=0.0001 --batch_size=16 --load_dir=/data/quartznet_checkpoints/
+```
