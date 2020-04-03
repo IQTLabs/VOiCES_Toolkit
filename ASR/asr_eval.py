@@ -47,6 +47,8 @@ if __name__ == '__main__':
                         default='none',type=str)
     parser.add_argument('-c',dest='CONFIG',help='path to config yaml',
                         default='none',type=str)
+    parser.add_argument('-o',dest='OUTPUT',help='out filepath',
+                        default='none',type=str)
     args = parser.parse_args()
 
     #load up the dataset
