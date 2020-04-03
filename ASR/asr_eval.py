@@ -70,4 +70,4 @@ if __name__ == '__main__':
         result = process_item(item,args.DATASET_ROOT,jasper)
         result_list.append(result)
     result_df = pd.DataFrame(result_list)
-    result_df.to_csv('finetuned_quartznet.csv')
+    result_df.to_csv(args.OUTPUT)
