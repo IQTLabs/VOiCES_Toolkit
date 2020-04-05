@@ -17,7 +17,7 @@ def batch(iterable, n=1):
 def process_batch(item_batch,dataset_root,jasper_model,sample_rate=16000):
     result_batch = []
     noisy_waveform_list = []
-    clean_waveform_lIst = []
+    clean_waveform_list = []
 
     for item in item_batch:
         result_dict = {'query_name':item['query_name']}
