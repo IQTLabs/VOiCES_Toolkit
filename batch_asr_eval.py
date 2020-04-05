@@ -31,10 +31,10 @@ def process_batch(item_batch,dataset_root,jasper_model,sample_rate=16000):
         clean_waveform,_ = librosa.load(clean_filepath,sr=sample_rate)
         clean_waveform_list.append(clean_waveform)
 
-        pesq_nb = pesq.pesq(16000,clean_waveform,noisy_waveform,'nb')
-        pesq_wb = pesq.pesq(16000,clean_waveform,noisy_waveform,'wb')
-        result_dict['pesq nb'] = pesq_nb
-        result_dict['pesq wb'] = pesq_wb
+        #pesq_nb = pesq.pesq(16000,clean_waveform,noisy_waveform,'nb')
+        #pesq_wb = pesq.pesq(16000,clean_waveform,noisy_waveform,'wb')
+        #result_dict['pesq nb'] = pesq_nb
+        #result_dict['pesq wb'] = pesq_wb
         result_batch.append(result_dict)
 
     noisy_result = jasper_model.infer(waveforms=noisy_waveform_list)
