@@ -3,6 +3,7 @@ import argparse
 import pandas as pd
 import pesq
 import librosa
+from tqdm import tqdm
 from joblib import Parallel, delayed
 
 def process_item(item,dataset_root,sample_rate=16000):
@@ -40,6 +41,6 @@ if __name__ == '__main__':
     records = full_df.to_dict('records')
 
     process_func = lambda record: process_item(record,args.DATASET_ROOT)
-    result_list = Parallel(n_jobs=8)(delayed(process_func)(item) for item in records)
+    result_list = Parallel(n_jobs=8)(delayed(process_func)(item) for item in tqdm(records))
     result_df = pd.DataFrame(result_list)
     result_df.to_csv('full_pesq.csv')
