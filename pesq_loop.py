@@ -2,6 +2,9 @@ import os
 import argparse
 import pandas as pd
 import pesq
+import pystoi
+import pysiib
+import srmrpy
 import librosa
 from tqdm import tqdm
 from joblib import Parallel, delayed
@@ -16,14 +19,22 @@ def process_item(item,dataset_root,sample_rate=16000):
     clean_waveform,_ = librosa.load(clean_filepath,sr=sample_rate)
 
     if len(noisy_waveform)==len(clean_waveform):
-        pesq_nb = pesq.pesq(16000,clean_waveform,noisy_waveform,'nb')
-        pesq_wb = pesq.pesq(16000,clean_waveform,noisy_waveform,'wb')
+        pesq_nb = pesq.pesq(sample_rate,clean_waveform,noisy_waveform,'nb')
         result_dict['pesq nb'] = pesq_nb
+        pesq_wb = pesq.pesq(sample_rate,clean_waveform,noisy_waveform,'wb')
         result_dict['pesq wb'] = pesq_wb
+        stoi = pystoi.stoi(clean_waveform,noisy_waveform,sample_rate)
+        result_dict['STOI']=stoi
+        siib = pysiib.SIIB(clean_waveform,noisy_waveform,sample_rate,gauss=True)
+        result_dict['SIIB']=siib
+        srmr = srmrpy.srmr(noisy_waveform,sample_rate,norm=True)[0]
+        result_dict['SRMR']=srmr
     else:
         result_dict['pesq nb'] = -1
         result_dict['pesq wb'] = -1
-
+        result_dict['STOI'] = -1
+        result_dict['SIIB'] = -1
+        result_dict['SRMR'] = -1
     return result_dict
 
 if __name__ == '__main__':
