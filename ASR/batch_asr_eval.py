@@ -1,3 +1,34 @@
+"""
+This script is for running inference on the VOiCES dataset using JasperInference
+class.  It takes in the following command line arguments
+
+-r : The absolute path to the root of the dataset
+-i : The absolute path to the VOiCES index file (.csv) that indexes all the
+files for inference
+-e : The path to the weights for the Japser/Quartznet encoder
+-d : The path to the weights for the Japser/Quartznet decoder
+-c : The path to the Jasper/Quartznet config file (.yml)
+-o : The filepath that the inference results should be put out, includes .csv
+extension
+-b : The inference batch size, larger values will take advantage of GPU
+acceleration better
+--use_cpu : boolean. If enabled, NeMo computations will be done on CPU
+
+
+The output is a csv file with a row for each file and the following columns
+query_name: The VOiCES filename with the path info removed (string), can be
+used for joining the inference results table with other tables
+ground_truth: The ground truth transcript for the recording
+noisy_transcript: The predicted transcript when running jasper on the VOiCES
+recording
+clean_transcript: The predicted transcript when running jasper on the original
+librispeech recording
+noisy wer: The word error rate of the noisy transcript with respect to the
+ground truth
+clean wer: The word error rate of the clean transcript with respect to the
+ground truth
+"""
+
 import numpy as np
 import os
 import argparse
@@ -15,6 +46,19 @@ def batch(iterable, n=1):
         yield iterable[ndx:min(ndx + n, l)]
 
 def process_batch(item_batch,dataset_root,jasper_model,sample_rate=16000):
+    """
+    Perform inference on and post-process a batch of VOiCES recordings
+
+    Arguments:
+        item_batch: A list of dictionaries, corresponding to entries in a
+            VOiCES index.
+        dataset_root:  The absolute path to the root of the dataset
+        jasper_model:  An instance of the JasperInference class
+        sample_rate:  The sample rate of the recordings
+    Returns:
+        result_batch:  A list of dictionaries, with one for each item in
+            item_batch.
+    """
     result_batch = []
     noisy_waveform_list = []
     clean_waveform_list = []
