@@ -107,7 +107,7 @@ if __name__ == '__main__':
     parser.add_argument('-o',dest='OUTPUT',help='out filepath',
                         default='none',type=str)
     parser.add_argument('-b',dest='BATCH_SIZE',help='batch size',
-                        default='8',type=int)
+                        default=8,type=int)
     parser.add_argument('--use_cpu',dest='USE_CPU',action='store_true',
                         help='use the cpu')
     args = parser.parse_args()
