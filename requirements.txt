@@ -4,6 +4,4 @@ nemo-asr
 librosa
 pandas
 ruamel.yaml
-cython
-pesq
 tqdm
