@@ -40,7 +40,9 @@ python build_indices.py -r <path_to_voices_root> -i <path_to_index_location>
 * `<path_to_voices_root>` is the absolute path to the root of the voices
 file directory  
 * `<path_to_index_location>` should be the absolute path to
-the directory where the index files should be location, which defaults .
+the directory where the index files should be saved which defaults `<path_to_voices_root>/references/`.
+
+This script should only be necessary if files have been added to or removed from the `VOiCES_devkit` and `VOiCES_release` versions of the dataset ([instructions for download](https://voices18.github.io/)).  By default, the datasets come with these index files pre-built in `references/` directory.
 
 ## build_nemo_manifest.py
 
