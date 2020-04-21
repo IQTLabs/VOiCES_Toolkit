@@ -3,4 +3,5 @@ nemo-toolkit
 nemo-asr
 librosa
 pandas
-ruamel
+ruamel.yaml
+tqdm

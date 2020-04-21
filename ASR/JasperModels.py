@@ -13,6 +13,20 @@ import torch
 
 class JasperInference:
     def __init__(self,model_definition,use_cpu=True,encoder_module=None,decoder_module=None):
+        """
+        This class serves as a useful wrapper for doing inference with Jasper or
+        Quartznet like models, in a programmatic fashion.
+
+        Arguments:
+            model_definition:  A dictionary holding all necessary keyword
+                arguments and values to construct the jasper pipeline
+            use_cpu: If true, nemo computations are performed on the CPU.
+                Otherwise, computations are performed on the GPU.
+            encoder_module:  A neural module with the same neural type signature
+                as the Jasper Encoder
+            decoder_module:  A neural module with the same neural type signature
+                as the Jasper CTC decoder
+        """
         if use_cpu:
             self.neural_factory = nemo.core.NeuralModuleFactory(placement=nemo.core.DeviceType.CPU,
                                                        backend=nemo.core.Backend.PyTorch)
@@ -25,6 +39,15 @@ class JasperInference:
 
 
     def build_components(self,encoder_module=None,decoder_module=None):
+        """
+        Initializes all neural modules
+
+        Arguments:
+            encoder_module:  A neural module with the same neural type signature
+                as the Jasper Encoder
+            decoder_module:  A neural module with the same neural type signature
+                as the Jasper CTC decoder
+        """
         self.data_layer = AudioInferDataLayer(sample_rate=self.model_definition['sample_rate'])
         self.data_preprocessor = nemo_asr.AudioToMelSpectrogramPreprocessor(
             sample_rate=self.model_definition['sample_rate'],
@@ -58,13 +81,40 @@ class JasperInference:
         # TODO:  Add support for N-gram LM model
 
     def restore_weights(self,encoder_weight_path=None,decoder_weight_path=None):
+        """
+        Set the weights of the encoder and/or decoder modules
+
+        Arguments:
+            encoder_weight_path:  Path to the PyTorch weight file for the
+                encoder
+            decoder_weight_path:  Path to the PyTorch weight file for the
+                decoder
+        """
         if encoder_weight_path:
             self.encoder_weight_path = encoder_weight_path
             self.encoder.restore_from(encoder_weight_path)
         if decoder_weight_path:
             self.decoder_weight_path = decoder_weight_path
             self.decoder.restore_from(decoder_weight_path)
+
     def infer(self,filepaths=None,waveforms=None,return_logits=False):
+        """
+        Perform ASR inference on either a list of files or waveforms
+
+        Arguments:
+            filepaths: List of absolute filepaths to the .wav files transcribe
+            waveforms: List of waveforms to transcribe.  If filepaths is None,
+                then waveforms must be specified.
+            return_logits:  If true, also return the logits output by the
+                decoder
+        Returns:
+            return_dict: A dictionary with the following fields, where each
+                field is a list with an element for each element of either
+                filepaths or waveforms.
+                greedy_prediction: The result of greedy ctc decoding
+                greedy_transcript: The transcript form of the greedy prediction
+                logits: decoder output logits
+        """
         if filepaths is not None:
             waveforms = []
             for filepath in filepaths:
@@ -73,6 +123,8 @@ class JasperInference:
             self.data_layer.set_signal(waveforms)
         elif waveforms is not None:
             self.data_layer.set_signal(waveforms)
+        else:
+            raise ValueError("Need filepaths or waveforms")
         tensors_to_evaluate = [self.predictions]
         if return_logits:
             tensors_to_evaluate.append(self.log_probs)
