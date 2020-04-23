@@ -33,7 +33,7 @@ import numpy as np
 import os
 import argparse
 import pandas as pd
-from ASR.JasperModels import JasperInference
+from JasperModels import JasperInference
 from ruamel.yaml import YAML
 import pesq
 import librosa

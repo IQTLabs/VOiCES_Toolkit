@@ -3,7 +3,7 @@ import nemo_asr
 from nemo_asr.helpers import post_process_predictions, word_error_rate
 import numpy as np
 from nemo_asr.parts.features import WaveformFeaturizer
-from .infer_datalayers import AudioInferDataLayer
+from infer_datalayers import AudioInferDataLayer
 from nemo.core.neural_modules import NeuralModule
 from nemo.backends.pytorch.nm import DataLayerNM
 from nemo.core.neural_types import *
